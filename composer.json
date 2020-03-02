@@ -1,22 +1,18 @@
 {
-    "name": "laravel-zero/laravel-zero",
-    "description": "The Laravel Zero Framework.",
-    "keywords": ["framework", "laravel", "laravel zero", "console", "cli"],
+    "name": "deligoz/emoji-cli",
+    "description": "",
+    "keywords": ["emoji", "unicode", "alfred", "snippet", "cli"],
     "homepage": "https://laravel-zero.com",
     "type": "project",
     "license": "MIT",
-    "support": {
-        "issues": "https://github.com/laravel-zero/laravel-zero/issues",
-        "source": "https://github.com/laravel-zero/laravel-zero"
-    },
     "authors": [
         {
-            "name": "Nuno Maduro",
-            "email": "enunomaduro@gmail.com"
+            "name": "Yunus Emre Deligöz",
+            "email": "ye@deligoz.me"
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.3",
         "laravel-zero/framework": "^6.0"
     },
     "require-dev": {

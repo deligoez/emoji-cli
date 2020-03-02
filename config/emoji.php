@@ -5,4 +5,5 @@ return [
     'tempFileName'       => 'emoji.zip',
     'githubUrl'          => 'https://github.com/unicode-org/cldr/archive/latest.zip',
     'repositoryDataPath' => 'cldr-latest/common/annotationsDerived/',
+    'dataFolderName'     => 'data',
 ];

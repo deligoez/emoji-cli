@@ -12,14 +12,14 @@ class DownloadEmojisCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'download';
 
     /**
      * The description of the command.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Download Emojis from official Unicode repository';
 
     /**
      * Execute the console command.
@@ -29,16 +29,5 @@ class DownloadEmojisCommand extends Command
     public function handle()
     {
         //
-    }
-
-    /**
-     * Define the command's schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
-     * @return void
-     */
-    public function schedule(Schedule $schedule): void
-    {
-        // $schedule->command(static::class)->everyMinute();
     }
 }

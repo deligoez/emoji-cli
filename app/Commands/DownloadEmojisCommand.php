@@ -4,6 +4,8 @@ namespace App\Commands;
 
 use Exception;
 use ZipArchive;
+use DOMDocument;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use LaravelZero\Framework\Commands\Command;
@@ -64,14 +66,72 @@ class DownloadEmojisCommand extends Command
         });
 
         $this->task('Extracting emojis ...', function() {
-            // TODO: Just code snippet
-            $xml = new DomDocument('1.0', 'utf-8');
-            $xml->load(
-                '/Users/deligoez/Downloads/cldr-release-37-alpha1/common/annotationsDerived/tr.xml'
-            );
+            $files = Storage::files(config('emoji.tempFolder').config('emoji.repositoryDataPath'));
 
-            foreach ($xml->getElementsByTagName('annotation') as $item) {
-                echo explode(' | ', $item->nodeValue)[0] . PHP_EOL;
+            foreach ($files as $file) {
+                $languageName = explode('/', $file);
+                $languageName = $languageName[count($languageName) - 1];
+
+                $this->task(PHP_EOL.'Processing language: ' .$languageName , function() use ($file, $languageName) {
+                    $xml = new DomDocument('1.0', 'utf-8');
+                    $xml->load(Storage::path($file));
+
+                    $emojis = collect();
+                    $emojiSymbols = collect();
+                    $zip = new ZipArchive;
+
+                    foreach ($xml->getElementsByTagName('annotation') as $item) {
+                        if ($zip->open(Storage::path('tempData/'. str_replace('.xml', '', $languageName) . '.alfredsnippets'), ZipArchive::CREATE) === true)
+                        {
+                            $emoji = $item->attributes['cp']->value;
+
+                            // Don't add if it already contains.
+                            if  ($emojiSymbols->contains($emoji))
+                            {
+                                continue;
+                            } else {
+                                $emojiSymbols->push($emoji);
+                            }
+
+                            $uuid = strtoupper(Uuid::uuid4()->toString());
+                            $keywords = explode(' | ', $item->nodeValue);
+                            $keyword = '';
+                            array_multisort(array_map('strlen', $keywords),SORT_DESC, $keywords);
+                            $dontAutoExpand = false;
+
+                            foreach ($keywords as $keyword) {
+                                if (!$emojis->contains($keyword))
+                                {
+                                    $emojis->push($keyword);
+                                    $keyword = ":{$keyword}:";
+                                }
+                            }
+
+                            // keyword is not unique
+                            if (empty($keyword))
+                            {
+                                $dontAutoExpand = true;
+                                $keyword = ":{$keywords[0]}:";
+                            }
+
+                            $emojiEntry = [
+                                'alfredsnippet' => [
+                                    'name'           => $emoji.' : '.implode(' | ', $keywords),
+                                    'dontautoexpand' => $dontAutoExpand,
+                                    'keyword'        => $keyword,
+                                    'snippet'        => $emoji,
+                                    'uid'            => $uuid,
+                                ],
+                            ];
+
+                            $zip->addFromString($uuid.'.json',
+                                json_encode($emojiEntry, JSON_PRETTY_PRINT)
+                            );
+                        }
+                    }
+
+                    $zip->close();
+                });
             }
         });
     }

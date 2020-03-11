@@ -95,7 +95,7 @@ class DownloadEmojisCommand extends Command
 
                             $uuid = strtoupper(Uuid::uuid4()->toString());
                             $keywords = explode(' | ', $item->nodeValue);
-                            $keyword = '';
+                            $snippet = '';
                             array_multisort(array_map('strlen', $keywords),SORT_DESC, $keywords);
                             $dontAutoExpand = false;
 
@@ -103,22 +103,23 @@ class DownloadEmojisCommand extends Command
                                 if (!$emojis->contains($keyword))
                                 {
                                     $emojis->push($keyword);
-                                    $keyword = ":{$keyword}:";
+                                    $snippet = ":{$keyword}:";
                                 }
                             }
 
                             // keyword is not unique
-                            if (empty($keyword))
+                            if (empty($snippet))
                             {
                                 $dontAutoExpand = true;
-                                $keyword = ":{$keywords[0]}:";
+
+                                $snippet = empty($keywords[1]) ? $keywords[0] : $keywords[1];
                             }
 
                             $emojiEntry = [
                                 'alfredsnippet' => [
                                     'name'           => $emoji.' : '.implode(' | ', $keywords),
                                     'dontautoexpand' => $dontAutoExpand,
-                                    'keyword'        => $keyword,
+                                    'keyword'        => $snippet,
                                     'snippet'        => $emoji,
                                     'uid'            => $uuid,
                                 ],
